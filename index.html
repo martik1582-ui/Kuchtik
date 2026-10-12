@@ -3,34 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kuchtík - Recepty & Nákupní seznam</title>
+  <title>Kuchtík - Pokročilý receptář</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 20px auto; padding: 0 15px; background: #f9f9f9; color: #333; }
-    .box { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    button { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 5px; }
-    button:hover { background: #218838; }
-    input { padding: 10px; width: calc(100% - 22px); margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
-    pre { white-space: pre-wrap; background: #f1f1f1; padding: 10px; border-radius: 5px; }
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 15px auto; padding: 0 12px; background: #f4f6f8; color: #222; }
+    .box { background: white; padding: 16px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    h1 { text-align: center; color: #2e7d32; margin-bottom: 15px; }
+    h2 { font-size: 1.1rem; margin-top: 0; color: #333; border-bottom: 2px solid #e8f5e9; padding-bottom: 6px; }
+    label { display: block; font-weight: 600; margin: 8px 0 4px; font-size: 0.9rem; }
+    input[type="text"], input[type="number"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 15px; margin-bottom: 8px; }
+    .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.85rem; margin-bottom: 10px; }
+    .checkbox-group label { font-weight: normal; margin: 0; display: flex; align-items: center; gap: 5px; }
+    button { background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 8px; transition: background 0.2s; }
+    button:active { background: #1b5e20; }
+    .recipe-card { background: white; padding: 18px; border-radius: 12px; margin-top: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .recipe-img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; background: #eee; }
+    .tag { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; margin-right: 5px; font-weight: 600; }
+    .rating-stars { color: #ffb300; font-size: 1.3rem; cursor: pointer; text-align: center; margin: 10px 0; }
+    pre { white-space: pre-wrap; font-family: inherit; font-size: 0.95rem; line-height: 1.5; }
   </style>
 </head>
 <body>
 
-  <h1>🍳 Kuchtík</h1>
+  <h1>🍳 Kuchtík Pro</h1>
 
-  <!-- 1. SEKCE: MOJE SPÍŽ -->
+  <!-- 1. SPÍŽ -->
   <div class="box">
     <h2>1. Moje spíž (co mám doma)</h2>
-    <input type="text" id="spizInput" placeholder="Např. kuřecí maso, smetana, rýže">
+    <input type="text" id="spizInput" placeholder="Např. vajíčka, rajčata, sýr, mouka">
     <button onclick="ulozSpiz()">Uložit spíž</button>
-    <p><strong>Aktuálně v lednici:</strong><br><span id="spizZobrazeni" style="color: #666;">Zatím prázdno</span></p>
+    <p style="font-size:0.85rem; margin-top:8px;"><strong>V lednici:</strong> <span id="spizZobrazeni" style="color:#666;">Zatím prázdno</span></p>
   </div>
 
-  <!-- 2. SEKCE: GENERÁTOR -->
+  <!-- 2. FILTRY A PREFERENCE -->
   <div class="box">
-    <h2>2. Co budeme vařit?</h2>
-    <button onclick="generujRecept()">🎲 Vymyslet recept z mé spíže</button>
-    <div id="vystupReceptu" style="margin-top: 15px;"></div>
+    <h2>2. Filtry a preference</h2>
+    
+    <label>🚫 Alergeny a omezení:</label>
+    <div class="checkbox-group">
+      <label><input type="checkbox" id="alCesnek"> 🧄 Bez česneku</label>
+      <label><input type="checkbox" id="alLepek"> 🌾 Bez lepku</label>
+      <label><input type="checkbox" id="alLaktoza"> 🥛 Bez laktózy</label>
+      <label><input type="checkbox" id="alOrechy"> 🥜 Bez ořechů</label>
+    </div>
+
+    <label>🥗 Dieta a typ stravy:</label>
+    <select id="dietaSelect">
+      <option value="Všechno (bez omezení)">Všechno (bez omezení)</option>
+      <option value="Vegetariánská">Vegetariánská</option>
+      <option value="Veganská">Veganská</option>
+      <option value="Keto / Low Carb">Keto / Low Carb</option>
+      <option value="Fit / Nízkokalorická">Fit / Nízkokalorická</option>
+    </select>
+
+    <label>🍰 Kategorie / Typ jídla:</label>
+    <select id="kategorieSelect">
+      <option value="Hlavní chod">Hlavní chod</option>
+      <option value="Rychlá svačina">Rychlá svačina</option>
+      <option value="Sladkost / Dezert">Sladkost / Dezert</option>
+      <option value="Polévka">Polévka</option>
+    </select>
+
+    <div style="display:flex; gap:10px;">
+      <div style="flex:1;">
+        <label>👥 Počet porcí:</label>
+        <input type="number" id="porceInput" value="1" min="1" max="10">
+      </div>
+      <div style="flex:1;">
+        <label>⏱️ Max. čas:</label>
+        <select id="casSelect">
+          <option value="do 15 minut">do 15 min</option>
+          <option value="do 30 minut" selected>do 30 min</option>
+          <option value="do 60 minut">do 60 min</option>
+          <option value="Bez omezení">Bez omezení</option>
+        </select>
+      </div>
+    </div>
+
+    <label>🎚️ Obtížnost přípravy:</label>
+    <select id="obtiznostSelect">
+      <option value="Snadná">Snadná (pro začátečníky)</option>
+      <option value="Střední" selected>Střední</option>
+      <option value="Pokročilá">Pokročilá</option>
+    </select>
+
+    <button onclick="generujRecept()">🎲 Hledat recept podle filtrů</button>
   </div>
+
+  <!-- VÝSTUP RECEPTU -->
+  <div id="vystupReceptu"></div>
 
   <script>
     const API_KEY = "AQ.Ab8RN6JgYHFE905ncqIIQ1Pb9FlSdPGRKwmH20pnJFyZf4XR3Q";
@@ -48,27 +108,53 @@
         localStorage.setItem("kuchtik_spiz", hodnota);
         document.getElementById("spizZobrazeni").innerText = hodnota;
         document.getElementById("spizInput").value = "";
-        alert("Spíž byla uložena!");
+        alert("Spíž uložena!");
       }
     }
 
     async function generujRecept() {
-      const spiz = localStorage.getItem("kuchtik_spiz") || "žádné zadané suroviny";
+      const spiz = localStorage.getItem("kuchtik_spiz") || "běžné ingredience";
+      const porce = document.getElementById("porceInput").value || 1;
+      const dieta = document.getElementById("dietaSelect").value;
+      const kategorie = document.getElementById("kategorieSelect").value;
+      const cas = document.getElementById("casSelect").value;
+      const obtiznost = document.getElementById("obtiznostSelect").value;
       const vystup = document.getElementById("vystupReceptu");
-      
-      vystup.innerHTML = "<p>👨‍🍳 Kuchtík přemýšlí nad receptem...</p>";
+
+      // Sbírání alergenů
+      let alergeny = [];
+      if (document.getElementById("alCesnek").checked) alergeny.push("ČESNEK (přísný zákaz)");
+      if (document.getElementById("alLepek").checked) alergeny.push("Lepek");
+      if (document.getElementById("alLaktoza").checked) alergeny.push("Laktóza");
+      if (document.getElementById("alOrechy").checked) alergeny.push("Ořechy");
+
+      vystup.innerHTML = "<div class='box'><p>👨‍🍳 Kuchtík sestavuje recept podle vašich parametrů...</p></div>";
 
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-      const prompt = `Jsi chytrý kuchař. Mám v lednici tyto ingredience: ${spiz}. 
-Vymysli z nich 1 skvělý recept. 
-Formátuj odpověď přehledně česky:
-- Název jídla
-- Co se použije ze spíže
-- Co případně dokoupit (nákupní seznam)
-- Stručný postup přípravy`;
+      const prompt = `Jsi profesionální šéfkuchař. Vytvoř recept podle parametrů:
+- Ingredience k dispozici: ${spiz}
+- Kategorie jídla: ${kategorie}
+- Počet porcí: ${porce}
+- Dieta: ${dieta}
+- Zakázané alergeny/suroviny: ${alergeny.length > 0 ? alergeny.join(", ") : "žádné"}
+- Max. čas: ${cas}
+- Obtížnost: ${obtiznost}
 
--      try {
+Formátuj výstup přehledně následovně:
+📌 Název jídla
+⏱️ Čas přípravy | 🎚️ Obtížnost | 💰 Orientační cena za porci (v Kč)
+
+🛒 Ingredience (přepočítané přesně na ${porce} porcí):
+(seznam s gramáží/množstvím)
+
+🛍️ Co dokoupit (pokud chybí ve spíži):
+(seznam)
+
+👨‍🍳 Postup přípravy (krok za krokem):
+(jasné instrukce)`;
+
+      try {
         const response = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -76,16 +162,36 @@ Formátuj odpověď přehledně česky:
         });
 
         const data = await response.json();
-        
+
         if (data.candidates && data.candidates[0].content) {
           const text = data.candidates[0].content.parts[0].text;
-          vystup.innerHTML = `<pre>${text}</pre>`;
+          const nazevJidla = text.split('\n')[0].replace('📌', '').trim();
+          const imgUrl = `https://pollinations.ai/p/${encodeURIComponent('appetizing food photo of ' + nazevJidla)}?width=600&height=400&nologo=true`;
+
+          vystup.innerHTML = `
+            <div class="recipe-card">
+              <img src="${imgUrl}" class="recipe-img" alt="${nazevJidla}" onerror="this.style.display='none'">
+              <div>
+                <span class="tag">${kategorie}</span>
+                <span class="tag">${dieta}</span>
+                <span class="tag">${porce} porce</span>
+              </div>
+              <pre>${text}</pre>
+              <hr>
+              <label>Ohodnoťte tento recept:</label>
+              <div class="rating-stars" onclick="vystupRating(event)">⭐⭐⭐⭐⭐</div>
+            </div>
+          `;
         } else {
-          vystup.innerHTML = "<p style='color:red;'>Chyba: Zkontrolujte prosím API klíč.</p>";
+          vystup.innerHTML = "<div class='box'><p style='color:red;'>Chyba: Nepodařilo se vygenerovat recept. Zkontrolujte API klíč.</p></div>";
         }
       } catch (err) {
-        vystup.innerHTML = "<p style='color:red;'>Chyba při komunikaci: " + err + "</p>";
+        vystup.innerHTML = "<div class='box'><p style='color:red;'>Chyba přenosu: " + err + "</p></div>";
       }
+    }
+
+    function vystupRating(e) {
+      alert("Děkujeme za ohodnocení receptu!");
     }
   </script>
 </body>
