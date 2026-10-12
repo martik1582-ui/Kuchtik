@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuchtík - Recepty & Nákupní seznam</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 20px auto; padding: 0 15px; background: #f9f9f9; color: #333; }
+    .box { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    button { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-top: 5px; }
+    button:hover { background: #218838; }
+    input { padding: 10px; width: calc(100% - 22px); margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
+    pre { white-space: pre-wrap; background: #f1f1f1; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>🍳 Kuchtík</h1>
+
+  <!-- 1. SEKCE: MOJE SPÍŽ -->
+  <div class="box">
+    <h2>1. Moje spíž (co mám doma)</h2>
+    <input type="text" id="spizInput" placeholder="Např. kuřecí maso, smetana, rýže">
+    <button onclick="ulozSpiz()">Uložit spíž</button>
+    <p><strong>Aktuálně v lednici:</strong><br><span id="spizZobrazeni" style="color: #666;">Zatím prázdno</span></p>
+  </div>
+
+  <!-- 2. SEKCE: GENERÁTOR -->
+  <div class="box">
+    <h2>2. Co budeme vařit?</h2>
+    <button onclick="generujRecept()">🎲 Vymyslet recept z mé spíže</button>
+    <div id="vystupReceptu" style="margin-top: 15px;"></div>
+  </div>
+
+  <script>
+    const API_KEY = "AQ.Ab8RN6JgYHFE905ncqIIQ1Pb9FlSdPGRKwmH20pnJFyZf4XR3Q";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const ulozenaSpiz = localStorage.getItem("kuchtik_spiz");
+      if (ulozenaSpiz) {
+        document.getElementById("spizZobrazeni").innerText = ulozenaSpiz;
+      }
+    });
+
+    function ulozSpiz() {
+      const hodnota = document.getElementById("spizInput").value;
+      if (hodnota) {
+        localStorage.setItem("kuchtik_spiz", hodnota);
+        document.getElementById("spizZobrazeni").innerText = hodnota;
+        document.getElementById("spizInput").value = "";
+        alert("Spíž byla uložena!");
+      }
+    }
+
+    async function generujRecept() {
+      const spiz = localStorage.getItem("kuchtik_spiz") || "žádné zadané suroviny";
+      const vystup = document.getElementById("vystupReceptu");
+      
+      vystup.innerHTML = "<p>👨‍🍳 Kuchtík přemýšlí nad receptem...</p>";
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+      const prompt = `Jsi chytrý kuchař. Mám v lednici tyto ingredience: ${spiz}. 
+Vymysli z nich 1 skvělý recept. 
+Formátuj odpověď přehledně česky:
+- Název jídla
+- Co se použije ze spíže
+- Co případně dokoupit (nákupní seznam)
+- Stručný postup přípravy`;
+
+-      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+
+        const data = await response.json();
+        
+        if (data.candidates && data.candidates[0].content) {
+          const text = data.candidates[0].content.parts[0].text;
+          vystup.innerHTML = `<pre>${text}</pre>`;
+        } else {
+          vystup.innerHTML = "<p style='color:red;'>Chyba: Zkontrolujte prosím API klíč.</p>";
+        }
+      } catch (err) {
+        vystup.innerHTML = "<p style='color:red;'>Chyba při komunikaci: " + err + "</p>";
+      }
+    }
+  </script>
+</body>
+</html>
