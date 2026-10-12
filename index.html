@@ -16,7 +16,7 @@
     button { background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; width: 100%; margin-top: 8px; transition: background 0.2s; }
     button:active { background: #1b5e20; }
     .recipe-card { background: white; padding: 18px; border-radius: 12px; margin-top: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .recipe-img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; background: #eee; }
+    .recipe-img { width: 100%; height: 220px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; background: #eee; }
     .tag { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; margin-right: 5px; font-weight: 600; }
     .rating-stars { color: #ffb300; font-size: 1.3rem; cursor: pointer; text-align: center; margin: 10px 0; }
     pre { white-space: pre-wrap; font-family: inherit; font-size: 0.95rem; line-height: 1.5; }
@@ -121,7 +121,6 @@
       const obtiznost = document.getElementById("obtiznostSelect").value;
       const vystup = document.getElementById("vystupReceptu");
 
-      // Sbírání alergenů
       let alergeny = [];
       if (document.getElementById("alCesnek").checked) alergeny.push("ČESNEK (přísný zákaz)");
       if (document.getElementById("alLepek").checked) alergeny.push("Lepek");
